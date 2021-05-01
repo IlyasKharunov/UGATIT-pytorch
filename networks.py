@@ -1,4 +1,5 @@
 import torch
+from tnt import TNT
 import torch.nn as nn
 from torch.nn.parameter import Parameter
 
@@ -31,8 +32,18 @@ class ResnetGenerator(nn.Module):
 
         # Down-Sampling Bottleneck
         mult = 2**n_downsampling
-        for i in range(n_blocks):
-            DownBlock += [ResnetBlock(ngf * mult, use_bias=False)]
+        #for i in range(n_blocks):
+        #    DownBlock += [ResnetBlock(ngf * mult, use_bias=False)]
+        DownBlock += [TNT(
+                            image_size = 64,        # size of image
+                            patch_dim = 384,        # dimension of patch token
+                            pixel_dim = ngf*mult,        # dimension of pixel token
+                            patch_size = 4,         # patch size
+                            pixel_size = 1,         # pixel size
+                            enc_depth = 2,          # depth of encoder
+                            dec_depth = 2,          # depth of decoder
+                            num_channels = ngf*mult     # number of input image channels
+                        )]
 
         # Class Activation Map
         self.gap_fc = nn.Linear(ngf * mult, 1, bias=False)
